@@ -17,7 +17,7 @@ const createUser = async (req, res) => {
 
     // Insert into Supabase
     const { data, error } = await supabase.from('users').insert([
-        { name, password: hashedPassword, role },
+        { name, password: hashedPassword, role, status: role === "cardadmin" ? true : false },
     ]);
 
     if (error) return res.status(500).json({ error: 'Error creating user' });
