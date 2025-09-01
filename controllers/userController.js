@@ -4,7 +4,7 @@ const { canManage } = require('../utils/roleValidator');
 
 // Create a user
 const createUser = async (req, res) => {
-    const { name, password, role } = req.body;
+    const { name, full_name, password, role } = req.body;  // ✅ added full_name
     const currentUserRole = req.user.role;
 
     // Role validation
@@ -17,7 +17,13 @@ const createUser = async (req, res) => {
 
     // Insert into Supabase
     const { data, error } = await supabase.from('users').insert([
-        { name, password: hashedPassword, role, status: role === "cardadmin" ? true : false },
+        {
+            name,                          // username
+            full_name,                     // ✅ store full name
+            password: hashedPassword,
+            role,
+            status: role === "cardadmin" ? true : false
+        },
     ]);
 
     if (error) return res.status(500).json({ error: 'Error creating user' });
@@ -51,7 +57,7 @@ const deleteUser = async (req, res) => {
 // Edit a user
 const editUser = async (req, res) => {
     const { id } = req.params;
-    const { name, password } = req.body;  // removed role from destructuring
+    const { name, full_name, password } = req.body;  // ✅ added full_name
     const currentUserRole = req.user.role;
 
     // Fetch the user to be edited
@@ -67,7 +73,8 @@ const editUser = async (req, res) => {
 
     // Prepare update data
     const updateData = {};
-    if (name) updateData.name = name;
+    if (name) updateData.name = name;          // username
+    if (full_name) updateData.full_name = full_name;  // ✅ update full name
     if (password) {
         updateData.password = await bcrypt.hash(password, 10);
     }
